@@ -1,0 +1,10 @@
+{
+  "cssStylesheets": [
+    "Chat/static/assets/style.css",
+    "Chat/static/assets/bootstrap-5.3.3-dist/css/bootstrap.min.css",
+    "Chat/static/assets/bootstrap-5.3.3-dist/css/bootstrap-utilities.min.css",
+    "Chat/static/assets/bootstrap-5.3.3-dist/css/bootstrap-grid.min.css"
+    
+  ]
+}
+
