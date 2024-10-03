@@ -9,8 +9,6 @@ html,body {
 
 .dcontainer {
 
- 
-
   display: flex;
   flex-direction: column;
   /*justify-content: center;*/
