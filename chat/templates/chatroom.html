@@ -67,10 +67,16 @@
     <nav class="py-2 border-bottom">
       <div class="container d-flex flex-wrap">
         <ul class="nav me-auto">
+
           <li class="nav-item"><a href="/"
               class="nav-link link-body-emphasis px-2 link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover active"
-              aria-current="page">Return To Home</a>
+              aria-current="page">Home</a>
           </li>
+          <li class="nav-item"><a href="/room"
+              class="nav-link link-body-emphasis px-2 link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">Room</a>
+          </li>
+
+
         </ul>
         <ul class="nav">
           <li class="nav-item"><a href="#" class="nav-link link-body-emphasis px-2">
@@ -80,7 +86,7 @@
                   d="M6.321 6.016c-.27-.18-1.166-.802-1.166-.802.756-1.081 1.753-1.502 3.132-1.502.975 0 1.803.327 2.394.948s.928 1.509 1.005 2.644q.492.207.905.484c1.109.745 1.719 1.86 1.719 3.137 0 2.716-2.226 5.075-6.256 5.075C4.594 16 1 13.987 1 7.994 1 2.034 4.482 0 8.044 0 9.69 0 13.55.243 15 5.036l-1.36.353C12.516 1.974 10.163 1.43 8.006 1.43c-3.565 0-5.582 2.171-5.582 6.79 0 4.143 2.254 6.343 5.63 6.343 2.777 0 4.847-1.443 4.847-3.556 0-1.438-1.208-2.127-1.27-2.127-.236 1.234-.868 3.31-3.644 3.31-1.618 0-3.013-1.118-3.013-2.582 0-2.09 1.984-2.847 3.55-2.847.586 0 1.294.04 1.663.114 0-.637-.54-1.728-1.9-1.728-1.25 0-1.566.405-1.967.868ZM8.716 8.19c-2.04 0-2.304.87-2.304 1.416 0 .878 1.043 1.168 1.6 1.168 1.02 0 2.067-.282 2.232-2.423a6.2 6.2 0 0 0-1.528-.161" />
               </svg>
             </a></li>
-          <li class="nav-item"><a href="#" class="nav-link link-body-emphasis px-2">USER</a></li>
+          <li class="nav-item"><a href="#" class="nav-link link-body-emphasis px-2" id="usernavbar">USER</a></li>
         </ul>
       </div>
     </nav>
@@ -106,42 +112,56 @@
   </div>
 
 
-  <div class="container-fluid vh-100 d-flex justify-content-center align-items-center">
+  <div class="container my-1">
 
-    <div class="container-main">
+    <div class="position-relative p-5 text-center text-muted bg-body border border-dashed rounded-3">
 
-      <div class="card border-0 border-bottom" style="border-radius: 0; border-bottom: 2px solid #000;">
-        <div class="card-body m-0">
-          <button class="sbutton" style="width: 96px;" onclick="location.href='/'">Return</button>
-          <button class="sbutton" style="width: 96px;" id="connectButton" onclick="">Connect</button>
-          <button class="sbutton" style="width: 110px;" id="disconnectButton" onclick="">Disconnect</button>
-        </div>
+      <div class="position-absolute top-0 end-0 d-flex align-items-start p-3 gap-2">
+        <!-- boton para conectar -->
+        <button type="button" id="connectButton" class="btn btn-light bg-secondary bg-opacity-10 rounded-5"
+          aria-label="Connect">
+          Connect
+        </button>
+
+        <!-- boton de cerrar -->
+        <button type="button" class="btn btn-light bg-secondary bg-opacity-10 rounded-5" aria-label="Close"
+          id="closeButton">
+          Close
+        </button>
+
+
       </div>
 
+      <!-- titulo del chat -->
+      <h1 class="text-body-emphasis">Welcome</h1>
 
-      <div class="chat-container container-fluid">
+      <!-- Contenedor para los mensajes -->
+      <div id="chat-messages" class="bg-light border rounded p-3 my-2 overflow-auto"
+        style="height: 250px; min-height: 128px; max-height: 300px;">
 
-        <h1 class="display-6 text-center">Welcome</h1>
+        <!-- Aqui van los mensajes de chat -->
 
-        <div id="chat-box">
-
+        <!--
+        <div class="text-start mb-2">
+          <strong>User 1:</strong> Hello, how are you?
         </div>
-        <div class="input-group mt-3">
-          <input type="text" class="form-control" placeholder="Type a message..." aria-label="Chat input"
-            id="messageInput">
-          <button class="btn btn-primary" id="sendButton" type="button">Send</button>
-        </div>
+
+        <div class="text-end mb-2">
+          <strong>You:</strong> I'm good, thanks!
+        </div> -->
+
+
       </div>
 
-      <div class="card" style="margin-top: 20px;  margin-bottom: 100px;">
-        <h5 class="card-header">Log</h5>
-        <div id="chat-log" class="card-body" style="max-height: 128px; overflow-y: auto;">
-
-        </div>
+      <!-- Campo de entrada para mensajes -->
+      <div class="input-group mb-3">
+        <input type="text" class="form-control" placeholder="Type your message..." aria-label="Chat message"
+          aria-describedby="button-send" id="input-message">
+        <button class="btn btn-light" type="button" id="buttonSend">Send</button>
       </div>
-
-
     </div>
+
+
 
   </div>
 
@@ -154,75 +174,75 @@
 
 
   <script>
-
     let chatSocket = null;
     let username = null;
+    let localUserName = "";
 
-    function writeMessage(str_sender, str_message) {
-      const chatBox = document.getElementById('chat-box');
-      const messageElement = document.createElement('p');
-      messageElement.innerHTML = `<strong>${str_sender}: </strong> ${str_message}`;
-      chatBox.appendChild(messageElement);
-      chatBox.scrollTop = chatBox.scrollHeight;
+    // Función para escribir el mensaje en el contenedor de chat
+    function writeMessage(str_sender, str_message, isSentByUser) {
+      const chatMessages = document.getElementById('chat-messages');
+      const messageElement = document.createElement('div');
+
+      // Alinear el mensaje dependiendo de si es enviado o recibido
+      messageElement.className = isSentByUser ? 'text-end mb-2' : 'text-start mb-2';
+      messageElement.innerHTML = `<strong>${str_sender}:</strong> ${str_message}`;
+
+      // Agregar el mensaje al contenedor
+      chatMessages.appendChild(messageElement);
+
+      // Hacer scroll hacia abajo automáticamente
+      chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
+    // Función para conectarse al WebSocket
     function connectWebSocket() {
       if (!username) {
         console.log("Username not set!");
         return;
       }
 
-      const chatLog = document.getElementById('chat-log');
-
       if (chatSocket && chatSocket.readyState === WebSocket.OPEN) {
         console.log("Already connected!");
-        chatLog.innerHTML += `<p class="card-text"> Already connected! </p>`;
-        chatLog.scrollTop = chatLog.scrollHeight;
         return;
       }
 
       chatSocket = new WebSocket('ws://' + window.location.host + '/ws/chatroom/welcome/');
 
-      chatSocket.onopen = function (e) {
+      chatSocket.onopen = function () {
         console.log("Connected to the WebSocket server");
-        chatLog.innerHTML += `<p class="card-text"> Connected to the WebSocket server! </p>`;
-        chatLog.scrollTop = chatLog.scrollHeight;
       };
 
       chatSocket.onmessage = function (e) {
         const data = JSON.parse(e.data);
-        writeMessage(data.username, data.message);
+
+        if(username == data.username){
+          writeMessage("You", data.message, true); // Mensajes recibidos se alinean a la izquierda
+        }else{
+          writeMessage(data.username, data.message, false); // Mensajes recibidos se alinean a la izquierda
+        }
+
       };
 
-      chatSocket.onclose = function (e) {
+      chatSocket.onclose = function () {
         console.log("Disconnected from the WebSocket server");
-        chatLog.innerHTML += `<p class="card-text"> Disconnected from the server.</p>`;
-        chatLog.scrollTop = chatLog.scrollHeight;
       };
 
       chatSocket.onerror = function (e) {
         console.log("WebSocket error: ", e);
-        chatLog.innerHTML += `<p class="card-text">WebSocket error: ${e}</p>`;
-        chatLog.scrollTop = chatLog.scrollHeight;
       };
     }
 
+    // Función para desconectarse del WebSocket
     function disconnectWebSocket() {
-
-      const chatLog = document.getElementById('chat-log');
-
       if (chatSocket && chatSocket.readyState === WebSocket.OPEN) {
         chatSocket.close();
         console.log("Disconnected manually from the WebSocket server");
-        chatLog.innerHTML += `<p class="card-text">Disconnected from the server.</p>`;
-        chatLog.scrollTop = chatLog.scrollHeight;
       } else {
-        chatLog.innerHTML += `<p class="card-text">No active connection to disconnect.</p>`;
-        chatLog.scrollTop = chatLog.scrollHeight;
+        console.log("No active connection to disconnect.");
       }
     }
 
-    // Abrir el modal para solicitar el nombre
+    // Abrir el modal para solicitar el nombre de usuario
     document.getElementById('connectButton').onclick = function () {
       const usernameModal = new bootstrap.Modal(document.getElementById('usernameModal'), {
         backdrop: 'static',
@@ -231,12 +251,14 @@
       usernameModal.show();
     };
 
-    // Confirmar el nombre y conectar al WebSocket
+    // Confirmar el nombre de usuario y conectar al WebSocket
     document.getElementById('confirmUsernameButton').onclick = function () {
       const input = document.getElementById('usernameInput').value.trim();
 
       if (input) {
         username = input;
+        document.getElementById('usernavbar').textContent = username;
+        localUserName = username;
         connectWebSocket();
 
         // Cerrar el modal una vez que el usuario haya ingresado su nombre
@@ -248,26 +270,32 @@
     };
 
     // Enviar mensaje cuando se presiona el botón "Send"
-    document.getElementById('sendButton').onclick = function () {
-      const messageInput = document.getElementById('messageInput');
+    document.getElementById('buttonSend').onclick = function () {
+      const messageInput = document.getElementById('input-message');
       const message = messageInput.value.trim();
 
       if (message && chatSocket && chatSocket.readyState === WebSocket.OPEN) {
+        // Enviar mensaje al servidor WebSocket
         chatSocket.send(JSON.stringify({
           'username': username,
           'message': message
         }));
 
+        // Mostrar mensaje enviado en el chat alineado a la derecha
+        //writeMessage('You', message, true);
+
+        // Limpiar el campo de entrada
         messageInput.value = '';
       } else {
-        console.log("No message sent!");
+        console.log("No message sent or no WebSocket connection.");
       }
     };
 
-    document.getElementById('disconnectButton').onclick = disconnectWebSocket;
-    ment.getElementById('disconnectButton').onclick = disconnectWebSocket;
-
+    //git 1234
+    // Desconectar cuando se presiona el botón "Close"
+    document.getElementById('closeButton').onclick = disconnectWebSocket;
   </script>
+
 
 </body>
 
