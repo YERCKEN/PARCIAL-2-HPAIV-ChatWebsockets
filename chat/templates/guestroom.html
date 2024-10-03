@@ -59,6 +59,50 @@
 
 <body class="">
 
+  <div class="navbar">
+
+    <form action=" {% url 'home'%}">
+
+      <button class="btnLogo">
+
+        <img src="{% static '../static/assets/chat2.png' %}" alt="">
+        <h1>ChatRoom</h1>
+
+      </button>
+      
+    </form>
+
+      <!--lISTA-->
+      <div class="header-opciones">
+
+        
+            <ul><a  id="pageSelected" href="{% url 'home' %}">Home</a></ul>
+            <ul><a href="{% url 'room' %}">Rooms</a></ul>
+
+
+      </div>
+
+    </div>
+
+  <!-- Modal para ingresar el nombre de usuario -->
+<div class="modal fade" id="usernameModal" tabindex="-1" aria-labelledby="usernameModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="usernameModalLabel">Enter your username</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <input type="text" id="usernameInput" class="form-control" placeholder="Enter your name">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" id="confirmUsernameButton">Join Chat</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
   <div class="container-fluid vh-100 d-flex justify-content-center align-items-center">
 
     <div class="container-main">
@@ -67,7 +111,7 @@
         <div class="card-body m-0">
           <button class="sbutton" style="width: 96px;" onclick="location.href='/'">Return</button>
           <button class="sbutton" style="width: 96px;" id="connectButton" onclick="">Connect</button>
-          <button class="sbutton" style="width: 96px;" id="disconnectButton" onclick="">Disconnect</button>
+          <button class="sbutton" style="width: 110px;" id="disconnectButton" onclick="">Disconnect</button>
         </div>
       </div>
 
@@ -85,7 +129,7 @@
         </div>
       </div>
 
-      <div class="card" style="margin-top: 20px;">
+      <div class="card" style="margin-top: 20px;  margin-bottom: 100px;">
         <h5 class="card-header">Log</h5>
         <div id="chat-log" class="card-body" style="max-height: 128px; overflow-y: auto;">
 
@@ -101,98 +145,123 @@
   </div>
 
   <footer class="footer border-top">
-    <a class="slink" href="/">About Echo Chat</a>
+    <a class="slink" href="/">© 2024 Jaime B. & Edwar G. </a>
+
   </footer>
+  
 
   <script>
 
-    let chatSocket = null;
-    let username = "guest" + Math.floor(Math.random() * 10000);
+let chatSocket = null;
+let username = null;
 
-    function writeMessage(str_sender, str_message) {
-      const chatBox = document.getElementById('chat-box');
-      const messageElement = document.createElement('p');
-      messageElement.innerHTML = `<strong>${str_sender}: </strong> ${str_message}`;
-      chatBox.appendChild(messageElement);
-      chatBox.scrollTop = chatBox.scrollHeight;
-    }
+function writeMessage(str_sender, str_message) {
+  const chatBox = document.getElementById('chat-box');
+  const messageElement = document.createElement('p');
+  messageElement.innerHTML = `<strong>${str_sender}: </strong> ${str_message}`;
+  chatBox.appendChild(messageElement);
+  chatBox.scrollTop = chatBox.scrollHeight;
+}
 
-    function connectWebSocket() {
-      const chatLog = document.getElementById('chat-log');
+function connectWebSocket() {
+  if (!username) {
+    console.log("Username not set!");
+    return;
+  }
 
-      if (chatSocket && chatSocket.readyState === WebSocket.OPEN) {
-        console.log("Already connected!");
-        chatLog.innerHTML += `<p class="card-text"> Already connected! </p>`;
-        chatLog.scrollTop = chatLog.scrollHeight;
-        return;
-      }
+  const chatLog = document.getElementById('chat-log');
 
-      // Crear nueva conexión WebSocket
-      chatSocket = new WebSocket('ws://' + window.location.host + '/ws/chatroom/guestroom/');
+  if (chatSocket && chatSocket.readyState === WebSocket.OPEN) {
+    console.log("Already connected!");
+    chatLog.innerHTML += `<p class="card-text"> Already connected! </p>`;
+    chatLog.scrollTop = chatLog.scrollHeight;
+    return;
+  }
 
-      chatSocket.onopen = function (e) {
-        console.log("Connected to the WebSocket server");
-        chatLog.innerHTML += `<p class="card-text"> Connected to the WebSocket server! </p>`;
-        chatLog.scrollTop = chatLog.scrollHeight;
-      };
+  chatSocket = new WebSocket('ws://' + window.location.host + '/ws/chatroom/guestroom/');
 
-      chatSocket.onmessage = function (e) {
-        const data = JSON.parse(e.data);
-        writeMessage(data.username, data.message);
-      };
+  chatSocket.onopen = function (e) {
+    console.log("Connected to the WebSocket server");
+    chatLog.innerHTML += `<p class="card-text"> Connected to the WebSocket server! </p>`;
+    chatLog.scrollTop = chatLog.scrollHeight;
+  };
 
-      chatSocket.onclose = function (e) {
-        console.log("Disconnected from the WebSocket server");
-        chatLog.innerHTML += `<p class="card-text"> Disconnected from the server.</p>`;
-        chatLog.scrollTop = chatLog.scrollHeight;
-      };
+  chatSocket.onmessage = function (e) {
+    const data = JSON.parse(e.data);
+    writeMessage(data.username, data.message);
+  };
 
-      chatSocket.onerror = function (e) {
-        console.log("WebSocket error: ", e);
-        chatLog.innerHTML += `<p class="card-text">WebSocket error: ${e}</p>`;
-        chatLog.scrollTop = chatLog.scrollHeight;
-      };
-    }
+  chatSocket.onclose = function (e) {
+    console.log("Disconnected from the WebSocket server");
+    chatLog.innerHTML += `<p class="card-text"> Disconnected from the server.</p>`;
+    chatLog.scrollTop = chatLog.scrollHeight;
+  };
 
-    function disconnectWebSocket() {
-      const chatLog = document.getElementById('chat-log');
+  chatSocket.onerror = function (e) {
+    console.log("WebSocket error: ", e);
+    chatLog.innerHTML += `<p class="card-text">WebSocket error: ${e}</p>`;
+    chatLog.scrollTop = chatLog.scrollHeight;
+  };
+}
 
-      if (chatSocket && chatSocket.readyState === WebSocket.OPEN) {
-        chatSocket.close();
-        console.log("Disconnected manually from the WebSocket server");
-        chatLog.innerHTML += `<p class="card-text">Disconnected from the server.</p>`;
-        chatLog.scrollTop = chatLog.scrollHeight;
-      } else {
-        chatLog.innerHTML += `<p class="card-text">No active connection to disconnect.</p>`;
-        chatLog.scrollTop = chatLog.scrollHeight;
-      }
-    }
+function disconnectWebSocket() {
+  const chatLog = document.getElementById('chat-log');
 
-    // Enviar mensaje cuando se presiona el botón "Send"
-    document.getElementById('sendButton').onclick = function () {
-      
-      const messageInput = document.getElementById('messageInput');
-      const message = messageInput.value.trim();
+  if (chatSocket && chatSocket.readyState === WebSocket.OPEN) {
+    chatSocket.close();
+    console.log("Disconnected manually from the WebSocket server");
+    chatLog.innerHTML += `<p class="card-text">Disconnected from the server.</p>`;
+    chatLog.scrollTop = chatLog.scrollHeight;
+  } else {
+    chatLog.innerHTML += `<p class="card-text">No active connection to disconnect.</p>`;
+    chatLog.scrollTop = chatLog.scrollHeight;
+  }
+}
 
-      if (message && chatSocket && chatSocket.readyState === WebSocket.OPEN) {
-        
-        //writeMessage(username, message);
+// Abrir el modal para solicitar el nombre
+document.getElementById('connectButton').onclick = function () {
+  const usernameModal = new bootstrap.Modal(document.getElementById('usernameModal'), {
+    backdrop: 'static',
+    keyboard: false
+  });
+  usernameModal.show();
+};
 
-        // Enviar el mensaje al servidor WebSocket
-        chatSocket.send(JSON.stringify({
-          'username': username,
-          'message': message
-        }));
+// Confirmar el nombre y conectar al WebSocket
+document.getElementById('confirmUsernameButton').onclick = function () {
+  const input = document.getElementById('usernameInput').value.trim();
+  
+  if (input) {
+    username = input;
+    connectWebSocket();
+    
+    // Cerrar el modal una vez que el usuario haya ingresado su nombre
+    const usernameModal = bootstrap.Modal.getInstance(document.getElementById('usernameModal'));
+    usernameModal.hide();
+  } else {
+    alert('Please enter a valid username.');
+  }
+};
 
-        // Limpiar el campo de entrada
-        messageInput.value = '';
-      }else{
-        console.log("no message sends!");
-      }
-    };
+// Enviar mensaje cuando se presiona el botón "Send"
+document.getElementById('sendButton').onclick = function () {
+  const messageInput = document.getElementById('messageInput');
+  const message = messageInput.value.trim();
 
-    document.getElementById('connectButton').onclick = connectWebSocket;
-    document.getElementById('disconnectButton').onclick = disconnectWebSocket;
+  if (message && chatSocket && chatSocket.readyState === WebSocket.OPEN) {
+    chatSocket.send(JSON.stringify({
+      'username': username,
+      'message': message
+    }));
+
+    messageInput.value = '';
+  } else {
+    console.log("No message sent!");
+  }
+};
+
+document.getElementById('disconnectButton').onclick = disconnectWebSocket;
+ment.getElementById('disconnectButton').onclick = disconnectWebSocket;
 
   </script>
 
