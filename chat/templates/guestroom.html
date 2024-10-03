@@ -121,7 +121,7 @@
 
       <div class="chat-container container-fluid">
 
-        <h1 class="display-6 text-center">Guestroom</h1>
+        <h1 class="display-6 text-center">Guest Room</h1>
 
         <div id="chat-box">
 
@@ -181,7 +181,7 @@
         return;
       }
 
-      chatSocket = new WebSocket('ws://' + window.location.host + '/ws/chatroom/guestroom/');
+      chatSocket = new WebSocket('ws://' + window.location.host + '/ws/chatroom/welcome/');
 
       chatSocket.onopen = function (e) {
         console.log("Connected to the WebSocket server");

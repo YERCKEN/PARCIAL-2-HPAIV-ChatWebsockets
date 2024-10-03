@@ -22,7 +22,7 @@ application = ProtocolTypeRouter({
     "http": get_asgi_application(),
     "websocket": AuthMiddlewareStack(
         URLRouter([
-          path('ws/chatroom/guestroom/', consumers.GroupGuestConsumer.as_asgi()),
+          path('ws/chatroom/welcome/', consumers.GroupGuestConsumer.as_asgi()),
           path('ws/chatroom/echo', consumers.EchoConsumer.as_asgi()),
         ])
     ),

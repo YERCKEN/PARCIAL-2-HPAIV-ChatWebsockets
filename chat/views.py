@@ -9,6 +9,10 @@ def room(request):
   return render(request, 'room.html') 
 
 
+def chatroom(request):
+  return render(request, 'chatroom.html')
+
+
 def guestroom(request):
   return render(request, 'guestroom.html')
 

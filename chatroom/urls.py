@@ -23,6 +23,6 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path('', views.home, name='home'),
     path('room/', views.room, name='room'),
-    path('chatroom/guest', views.guestroom, name='guestroom'),
-    path('chatroom/echo', views.echoroom, name='chatroom'),
+    path('room/welcome', views.chatroom, name='welcome'),
+    path('room/echo', views.echoroom, name='echo'),
 ]
